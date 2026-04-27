@@ -1,1 +1,79 @@
+**Install:** download one `.js` file. That's it. No `npm install`. No build step. Node 18+ and macOS are the only requirements.
+
+## What it does
+
+It exposes 14 tools to Claude:
+
+- `open_url`, `new_tab`, `close_current_tab`, `reload_page`, `go_back`, `go_forward`
+- `get_current_tab`, `list_tabs`, `activate_tab`
+- `get_page_text`, `get_page_html`
+- `run_javascript` — arbitrary JS in the active tab, returns the result
+- `search` — google / duckduckgo / bing / brave
+- `take_screenshot` — PNG of the front Safari window
+
+So you can say things like:
+
+> *"Open Hacker News and tell me the top three story titles."*
+> *"In the active tab, count the number of `<a>` tags."*
+> *"Take a screenshot of the page and save it to ~/Desktop."*
+
+…and Claude does it inside *your* Safari, with *your* sessions, *your* cookies, *your* logged-in accounts.
+
+## Why piggyback on real Safari instead of headless Chromium?
+
+- **Sessions just work.** No re-logging into Gmail, GitHub, your bank, your cloud console. The agent inherits whatever you're already authenticated for.
+- **Native macOS perf.** `osascript` + a single Node process. Idle RAM is rounding error.
+- **You can watch it work.** The agent's actions happen in a window you can see, intervene in, and trust.
+- **No vendored browser.** Nothing to update. Apple ships Safari for you.
+
+The tradeoff: macOS only. If you need cross-platform, [puppeteer-mcp](https://github.com/modelcontextprotocol/servers) is the right tool. This is for people who live in Safari.
+
+## How it's built
+
+The server is one file (`safari-mcp.js`, ~300 lines) that implements MCP's JSON-RPC 2.0 stdio protocol by hand — no `@modelcontextprotocol/sdk` dependency. Browser control routes through:
+
+- **AppleScript** for tab and window operations (`tell application "Safari" ...`)
+- **JXA (JavaScript for Automation)** for richer reads like enumerating tabs across windows
+- **Safari's `do JavaScript`** for `run_javascript`, gated behind the standard "Allow JavaScript from Apple Events" Develop-menu opt-in
+
+Adding a new tool is literally one entry in the `TOOLS` array.
+
+## Setup
+
+```bash
+curl -O https://raw.githubusercontent.com/<your-username>/claude-safari-mcp/main/safari-mcp.js
+```
+
+Claude Desktop — edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "safari": {
+      "command": "node",
+      "args": ["/absolute/path/to/safari-mcp.js"]
+    }
+  }
+}
+```
+
+Claude Code:
+
+```bash
+claude mcp add safari -- node /absolute/path/to/safari-mcp.js
+```
+
+First call triggers macOS's Automation permission prompt — approve once and you're done.
+
+## What's next
+
+- Reader-mode text extraction (cleaner than `innerText`)
+- Bookmarks + Reading List read APIs
+- Per-tab screenshots
+- Form-fill helpers on top of `run_javascript`
+- Streaming URL changes back to Claude as MCP resources
+
+Issues, PRs, weird ideas all welcome. The whole codebase is one file — fork it and tweak.
+
+**MIT licensed.** Built in an evening. Hope it saves you a few logins.
 

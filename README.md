@@ -1,5 +1,15 @@
 # Claude-to-Safari-MCP
-A zero-dependency MCP server that lets Claude drive the Safari you already have open on macOS. One Node.js file, no npm install, no headless browser. 
+
+A small collection of [Model Context Protocol](https://modelcontextprotocol.io) servers for Claude.
+
+| MCP | What it does | Where |
+| --- | --- | --- |
+| **safari-mcp** | Drive your real macOS Safari (open URLs, read pages, run JS, screenshot). Zero dependencies, single file. | [`safari-mcp.js`](./safari-mcp.js) |
+| **google-docs-mcp** | Read + edit Google Docs and Sheets, including charts and structural ops (T3). Multi-account aware. | [`google-docs-mcp/`](./google-docs-mcp) |
+
+Each MCP has its own setup instructions — see the linked file/folder.
+
+---
 
 # claude-safari-mcp
 

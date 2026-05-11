@@ -120,7 +120,7 @@ The whole protocol surface fits in ~30 lines at the bottom of [safari-mcp.js](./
 - [ ] Form-fill helpers built on top of `run_javascript`
 - [ ] Resource subscriptions: stream URL changes back to Claude
 
-PRs welcome. The whole codebase is one file — easy to grok, easy to fork.
+PRs welcome. The whole codebase is one file easy to grok, easy to fork.
 
 ## License
 
